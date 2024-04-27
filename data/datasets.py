@@ -11,8 +11,8 @@ from PIL import ImageFile
 from scipy.ndimage.filters import gaussian_filter
 import pickle
 import os 
-from skimage.io import imread
-from copy import deepcopy
+# from skimage.io import imread
+# from copy import deepcopy
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -64,6 +64,12 @@ class RealFakeDataset(Dataset):
             temp = 'train/progan' if opt.data_label == 'train' else 'test/progan'
             real_list = get_list( os.path.join(opt.wang2020_data_path,temp), must_contain='0_real' )
             fake_list = get_list( os.path.join(opt.wang2020_data_path,temp), must_contain='1_fake' )
+        elif opt.data_mode == 'truemedia':
+            # temp = 'train/' if opt.data_label == 'train' else 'test/'
+            real_list = get_list( os.path.join(opt.wang2020_data_path,""), must_contain="")
+            # add in celebahq training real data
+            real_list.extend(get_list(os.path.join('/home/ubuntu/Datasets/celebahq', 'train/'), must_contain='reals'))
+            fake_list = get_list(os.path.join('/home/ubuntu/Datasets/celebahq', 'train/'), must_contain='fakes' )
         elif opt.data_mode == 'ours_wang2020':
             pickle_name = "train.pickle" if opt.data_label=="train" else "val.pickle"
             real_list = get_list( os.path.join(opt.real_list_path, pickle_name) )
