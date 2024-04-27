@@ -93,6 +93,44 @@ python train.py --name=clip_vitl14 --wang2020_data_path=datasets/ --data_mode=wa
 ```
 - **Important**: do not forget to use the `--fix_backbone` argument during training, which makes sure that the only the linear layer's parameters will be trained.
 
+## Deploying Model
+
+The provided Dockerfile can be used to create an image:
+
+```
+export DOCKER_REGISTRY="hannahyk" # Put your Docker Hub username here  
+# Build the Docker image for runtime
+docker build -t "$DOCKER_REGISTRY/hannah-ufd" -f Dockerfile .
+```
+
+Run this Docker image locally on a GPU to test that it can run inferences as expected:
+```
+docker run --gpus=all -d --rm -p 80:8000 --env SERVER_PORT=8000  --name "hannah-ufd" "$DOCKER_REGISTRY/hannah-ufd"
+```
+
+In a separate terminal, run the following command one or more times
+
+```
+curl -X GET http://localhost:80/healthcheck
+```
+until you see {"healthy":true}.
+
+Then, test that inference can be run as expected:
+
+```
+curl -X POST http://localhost:8000/predict \
+    -H "Content-Type: application/json" \
+    --data '{"file_path":"https://uploads.civai.org/files/jhxTVhsg/b751515306e7.jpg"}'
+```
+
+Finally, if successful, push the docker image to docker hub:
+
+```
+docker login
+
+docker push "$DOCKER_REGISTRY/hannah-ufd:latest"
+```
+
 ## Acknowledgement
 
 We would like to thank [Sheng-Yu Wang](https://github.com/PeterWang512) for releasing the real/fake images from different generative models. Our training pipeline is also inspired by his [open-source code](https://github.com/PeterWang512/CNNDetection). We would also like to thank [CompVis](https://github.com/CompVis) for releasing the pre-trained [LDMs](https://github.com/CompVis/latent-diffusion) and [LAION](https://laion.ai/) for open-sourcing [LAION-400M dataset](https://laion.ai/blog/laion-400-open-dataset/).

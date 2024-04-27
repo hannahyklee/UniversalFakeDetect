@@ -1,0 +1,10 @@
+matplotlib
+numpy
+pandas
+scikit-learn
+sanic==23.3.0
+pillow
+requests
+tqdm
+ftfy
+regex

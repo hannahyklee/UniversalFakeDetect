@@ -4,7 +4,7 @@ from tensorboardX import SummaryWriter
 
 from validate import validate
 from data import create_dataloader
-from earlystop import EarlyStopping
+# from earlystop import EarlyStopping
 from networks.trainer import Trainer
 from options.train_options import TrainOptions
 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     train_writer = SummaryWriter(os.path.join(opt.checkpoints_dir, opt.name, "train"))
     val_writer = SummaryWriter(os.path.join(opt.checkpoints_dir, opt.name, "val"))
         
-    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
+    # early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
     start_time = time.time()
     print ("Length of data loader: %d" %(len(data_loader)))
     for epoch in range(opt.niter):
@@ -67,19 +67,20 @@ if __name__ == '__main__':
 
         # Validation
         model.eval()
-        ap, r_acc, f_acc, acc = validate(model.model, val_loader)
-        val_writer.add_scalar('accuracy', acc, model.total_steps)
-        val_writer.add_scalar('ap', ap, model.total_steps)
-        print("(Val @ epoch {}) acc: {}; ap: {}".format(epoch, acc, ap))
+        results_dict_default  = validate(model.model, val_loader)
+        val_writer.add_scalar('accuracy', results_dict_default['acc'], model.total_steps)
+        val_writer.add_scalar('ap', results_dict_default['ap'], model.total_steps)
+        print("(Val @ epoch {}) acc: {}; ap: {}".format(epoch, results_dict_default['acc'], results_dict_default['ap']))
+        
 
-        early_stopping(acc, model)
-        if early_stopping.early_stop:
-            cont_train = model.adjust_learning_rate()
-            if cont_train:
-                print("Learning rate dropped by 10, continue training...")
-                early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.002, verbose=True)
-            else:
-                print("Early stopping.")
-                break
+        # early_stopping(acc, model)
+        # if early_stopping.early_stop:
+        #     cont_train = model.adjust_learning_rate()
+        #     if cont_train:
+        #         print("Learning rate dropped by 10, continue training...")
+        #         early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.002, verbose=True)
+        #     else:
+        #         print("Early stopping.")
+        #         break
         model.train()
 
