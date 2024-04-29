@@ -118,7 +118,7 @@ until you see {"healthy":true}.
 Then, test that inference can be run as expected:
 
 ```
-curl -X POST http://localhost:8000/predict \
+curl -X POST http://localhost:80/predict \
     -H "Content-Type: application/json" \
     --data '{"file_path":"https://uploads.civai.org/files/jhxTVhsg/b751515306e7.jpg"}'
 ```
